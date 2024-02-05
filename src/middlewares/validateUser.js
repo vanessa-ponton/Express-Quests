@@ -1,19 +1,24 @@
-const { body, validationResult } = require('express-validator');
+const Joi = require("joi");
 
-const validateUser = [
-  body("email").isEmail(),
-  body("firstname").isLength({ max: 255 }),
-  body("lastname").isLength({ max: 255 }),
-  (req, res, next) => {
-    const errors = validationResult(req);
+const userSchema = Joi.object({
+  email: Joi.string().email().max(255).required(),
+  firstname: Joi.string().max(255).required(),
+  lastname: Joi.string().max(255).required(),
+});
 
-    if (!errors.isEmpty()) {
-      res.status(422).json({ validationErrors: errors.array() });
-    } else {
-      next();
-    }
-  },
-];
+const validateUser = (req, res, next) => {
+  const { firstname, lastname, email } = req.body;
 
+  const { error } = userSchema.validate(
+    { firstname, lastname, email },
+    { abortEarly: false }
+  );
+
+  if (error) {
+    res.status(422).json({ validationErrors: error.details });
+  } else {
+    next();
+  }
+};
 
 module.exports = validateUser;
