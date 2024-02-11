@@ -77,7 +77,7 @@ const postUser = (req, res) => {
 };
 
 const updateUser = (req, res) => {
-  const id = parseInt(req.params.id);
+  const id = parseInt(req.payload.sub);
   const { firstname, lastname, email, city, language, hashedPassword, verifyPassword } = req.body;
 
   database
@@ -89,7 +89,7 @@ const updateUser = (req, res) => {
       if (result.affectedRows === 0) {
         res.sendStatus(404);
       } else {
-        res.sendStatus(204);
+        res.status(403).send("Forbidden");
       }
     })
     .catch((err) => {
@@ -98,7 +98,7 @@ const updateUser = (req, res) => {
     });
 };
 const deleteUser = (req, res) => {
-  const id = parseInt(req.params.id);
+  const id = parseInt(req.payload.sub);
 
   database
     .query("delete from users where id = ?", [id])
@@ -111,7 +111,7 @@ const deleteUser = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      res.sendStatus(500);
+      res.status(403).send("Forbidden");
     });
 };
 
